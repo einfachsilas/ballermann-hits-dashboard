@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>BALLERMANN HITS 2026 - MALLE PARTY (Mega Hits) – Tracking Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #1db954;
+    --accent2: #f778ba;
+    --up: #3fb950;
+    --down: #f85149;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+    max-width: 900px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .card .value { font-size: 28px; font-weight: 700; }
+  .card .label { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .card.accent .value { color: var(--accent); }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1400px;
+  }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .panel h2 { font-size: 15px; margin: 0 0 14px; color: var(--text); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  tr.song-row { cursor: pointer; }
+  tr.song-row:hover { background: #1c2129; }
+  .pos { font-weight: 700; }
+  .delta-up { color: var(--up); }
+  .delta-down { color: var(--down); }
+  .delta-same { color: var(--muted); }
+  .delta-new { color: var(--accent2); font-size: 11px; }
+  .chart-row { display: none; }
+  .chart-row td { padding: 10px 8px 18px; }
+  .chart-wrap { height: 160px; max-width: 600px; }
+  canvas { max-width: 100%; }
+  .full-width { grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+  <h1>BALLERMANN HITS 2026 - MALLE PARTY (Mega Hits)</h1>
+  <div class="subtitle">Zuletzt aktualisiert: 2026-07-03 · 1 Snapshot(s) seit Trackingbeginn</div>
+
+  <div class="cards">
+    <div class="card accent"><div class="value">44</div><div class="label">Summerfield-Songs</div></div>
+    <div class="card"><div class="value">168</div><div class="label">Songs gesamt</div></div>
+    <div class="card"><div class="value">124</div><div class="label">Andere Labels</div></div>
+    <div class="card"><div class="value">42</div><div class="label">Label unbekannt</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel full-width">
+      <h2>Summerfield-Songs – aktuelle Position &amp; Verlauf</h2>
+      <table id="songTable">
+        <thead>
+          <tr><th>Song</th><th>Interpret</th><th>Position</th><th>Δ vs. letzte Woche</th><th>Erstmals in Playlist</th></tr>
+        </thead>
+        <tbody id="songTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Label-Verteilung</h2>
+      <div class="chart-wrap" style="height:320px"><canvas id="labelChart"></canvas></div>
+    </div>
+
+    <div class="panel">
+      <h2>Positions-Verlauf aller Summerfield-Songs</h2>
+      <div class="chart-wrap" style="height:320px"><canvas id="overviewChart"></canvas></div>
+    </div>
+  </div>
+
+<script id="payload" type="application/json">{"playlist_name": "BALLERMANN HITS 2026 - MALLE PARTY (Mega Hits)", "last_updated": "2026-07-03", "dates": ["2026-07-03"], "total": 168, "summerfield_count": 44, "other_count": 124, "unresolved_count": 42, "label_distribution": [{"label": "Summerfield Records", "count": 44}, {"label": "Unbekannt", "count": 42}, {"label": "Electrola", "count": 25}, {"label": "Xtreme Sound Recordings", "count": 8}, {"label": "[no label]", "count": 3}, {"label": "JINX Music", "count": 2}, {"label": "Polydor", "count": 2}, {"label": "Wird Wild", "count": 2}, {"label": "Zeitgeist", "count": 2}, {"label": "3AM MUSIC", "count": 1}, {"label": "Berliner Plattenbau", "count": 1}, {"label": "Berthold Records", "count": 1}, {"label": "Cat & Mouse Music", "count": 1}, {"label": "Chapter ONE", "count": 1}, {"label": "Dayme & El High Music", "count": 1}, {"label": "Decca Records", "count": 1}, {"label": "Drakkar Records", "count": 1}, {"label": "DSP Media", "count": 1}, {"label": "El Cartel Music", "count": 1}, {"label": "EMI", "count": 1}, {"label": "Epic Records Germany", "count": 1}, {"label": "French Part of Sweden", "count": 1}, {"label": "Gaffer Records", "count": 1}, {"label": "Hansa", "count": 1}, {"label": "HepTown Records", "count": 1}, {"label": "Hollywood Records", "count": 1}, {"label": "It", "count": 1}, {"label": "Johanna", "count": 1}, {"label": "jungeratze", "count": 1}, {"label": "Liberty EMI Records UK", "count": 1}, {"label": "Love & Pils Records", "count": 1}, {"label": "Mad Raccoon Records", "count": 1}, {"label": "Madizin Music", "count": 1}, {"label": "Metronome", "count": 1}, {"label": "nextBird Records", "count": 1}, {"label": "Nur Musik ist schöner", "count": 1}, {"label": "Oblivion", "count": 1}, {"label": "Pate Records", "count": 1}, {"label": "Pavement Records", "count": 1}, {"label": "Phonag Records", "count": 1}, {"label": "RCA Victor", "count": 1}, {"label": "Streetlife Music GmbH", "count": 1}, {"label": "Toni Music", "count": 1}, {"label": "Trailerpark", "count": 1}, {"label": "Universal Music", "count": 1}, {"label": "Warner Music Group Germany", "count": 1}, {"label": "White Records", "count": 1}], "summerfield_songs": [{"name": "Baby Bell", "artists": "Breitner", "position": 3, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 3}]}, {"name": "Iker Casillas (Deine Augen)", "artists": "Isi Glück, Julian Benz", "position": 9, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 9}]}, {"name": "Sonne, Mond & Playa", "artists": "Isi Glück", "position": 13, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 13}]}, {"name": "Malle Maus", "artists": "Breitner, Calvin Kleinen", "position": 15, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 15}]}, {"name": "Sie ist 18", "artists": "Kreisligalegende, Keya", "position": 16, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 16}]}, {"name": "FOREVER (Mein Herz schlägt)", "artists": "Nina Reh, NOISETIME", "position": 22, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 22}]}, {"name": "Goal Aperol", "artists": "Breitner", "position": 25, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 25}]}, {"name": "Bauhaus", "artists": "Calvin Kleinen, Malin Brown, Specktakel, Honk!", "position": 27, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 27}]}, {"name": "Nicht ohne mein Team (Inselliebe)", "artists": "Nina Reh, Pietro Lombardi", "position": 38, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 38}]}, {"name": "Aquarium", "artists": "DJ Robin, le Shuuk", "position": 40, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 40}]}, {"name": "Crush", "artists": "Calvin Kleinen", "position": 41, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 41}]}, {"name": "Malle tut mir gut", "artists": "Keya, Timo Scheppert, Domy Berger", "position": 48, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 48}]}, {"name": "Malle is' meine Religion", "artists": "Lukas Ballert", "position": 51, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 51}]}, {"name": "Ich schwanke noch", "artists": "Ikke Hüftgold", "position": 56, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 56}]}, {"name": "Popopo", "artists": "Breitner", "position": 58, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 58}]}, {"name": "Oh Baby", "artists": "Mia Julia", "position": 62, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 62}]}, {"name": "NACHTRINKEN", "artists": "Ikke Hüftgold", "position": 66, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 66}]}, {"name": "10 von 10", "artists": "Julian Benz", "position": 68, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 68}]}, {"name": "Oberteil", "artists": "Isi Glück, Marc Eggers", "position": 76, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 76}]}, {"name": "Bumsbar", "artists": "Ikke Hüftgold, Schürze, DJ Robin", "position": 79, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 79}]}, {"name": "Links Rechts", "artists": "Snollebollekes, DJ Robin, Ikke Hüftgold", "position": 80, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 80}]}, {"name": "Ex on the Beach", "artists": "Calvin Kleinen, Marvin Kleinen", "position": 81, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 81}]}, {"name": "Chaos im Kopf", "artists": "Isi Glück, le Shuuk", "position": 83, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 83}]}, {"name": "Sonnenbrand & Wodka-E", "artists": "DJ Robin, Domy Berger", "position": 84, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 84}]}, {"name": "Schwerstkriminell", "artists": "Nina Reh, Ikke Hüftgold, Playaton", "position": 85, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 85}]}, {"name": "Filmriss", "artists": "Ikke Hüftgold, Isi Glück", "position": 86, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 86}]}, {"name": "Delfin", "artists": "Honk!, Isi Glück", "position": 87, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 87}]}, {"name": "Ich baller mich weg (Abenteuerland)", "artists": "Julian Benz", "position": 90, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 90}]}, {"name": "Saufen wie die Römer", "artists": "Specktakel", "position": 97, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 97}]}, {"name": "Ryan in the Air", "artists": "Nina Reh", "position": 101, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 101}]}, {"name": "Geile Sau (Tattoo)", "artists": "Malin Brown, Lukas Ballert", "position": 103, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 103}]}, {"name": "Rapunzel - DJ Robin Remix", "artists": "Die Draufgänger, Ikke Hüftgold, DJ Robin", "position": 107, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 107}]}, {"name": "Dopamin", "artists": "Kreisligalegende", "position": 111, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 111}]}, {"name": "Mallearen", "artists": "Isi Glück", "position": 115, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 115}]}, {"name": "Knicklicht", "artists": "Isi Glück", "position": 118, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 118}]}, {"name": "Layla", "artists": "DJ Robin, Schürze", "position": 122, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 122}]}, {"name": "Johnny Däpp (Ich will Mallorca zurück)", "artists": "Lorenz Büffel", "position": 123, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 123}]}, {"name": "Malle is' Liebe", "artists": "Kreisligalegende", "position": 124, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 124}]}, {"name": "Engel", "artists": "Ikke Hüftgold", "position": 135, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 135}]}, {"name": "Doppelhorn", "artists": "Lorenz Büffel", "position": 136, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 136}]}, {"name": "Anna-Lena", "artists": "Honk!, Deejay Matze", "position": 138, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 138}]}, {"name": "Dorflove", "artists": "Kreisligalegende, Honk!, Party Nationalmannschaft", "position": 139, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 139}]}, {"name": "Kleine Fee", "artists": "Schürze", "position": 149, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 149}]}, {"name": "Mallorca (Da bin ich daheim)", "artists": "Mia Julia, DJ Mico", "position": 161, "first_seen": "2026-07-03", "prev_position": null, "history": [{"date": "2026-07-03", "position": 161}]}]}</script>
+<script>
+const data = JSON.parse(document.getElementById('payload').textContent);
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = '#30363d';
+
+// Label distribution bar chart (top 12)
+const topLabels = data.label_distribution.slice(0, 12);
+new Chart(document.getElementById('labelChart'), {
+  type: 'bar',
+  data: {
+    labels: topLabels.map(l => l.label),
+    datasets: [{
+      data: topLabels.map(l => l.count),
+      backgroundColor: topLabels.map(l => l.label === 'Summerfield Records' ? '#1db954' : '#484f58'),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: { x: { ticks: { stepSize: 1 } } }
+  }
+});
+
+// Overview line chart: all summerfield songs position over time
+const palette = ['#1db954','#f778ba','#58a6ff','#f0883e','#a371f7','#3fb950','#db6d28','#e3b341','#ff7b72','#79c0ff'];
+new Chart(document.getElementById('overviewChart'), {
+  type: 'line',
+  data: {
+    labels: data.dates,
+    datasets: data.summerfield_songs.map((s, i) => ({
+      label: s.name,
+      data: data.dates.map(d => {
+        const h = s.history.find(p => p.date === d);
+        return h ? h.position : null;
+      }),
+      borderColor: palette[i % palette.length],
+      backgroundColor: palette[i % palette.length],
+      spanGaps: true,
+      tension: 0.2,
+    }))
+  },
+  options: {
+    plugins: { legend: { display: data.summerfield_songs.length <= 8, labels: { boxWidth: 10, font: { size: 10 } } } },
+    scales: { y: { reverse: true, title: { display: true, text: 'Position (1 = oben)' } } }
+  }
+});
+
+// Song table with expandable per-song chart
+const tbody = document.getElementById('songTableBody');
+data.summerfield_songs.forEach((s, idx) => {
+  const row = document.createElement('tr');
+  row.className = 'song-row';
+  row.dataset.idx = idx;
+  let delta = '';
+  if (s.prev_position === null || s.prev_position === undefined) {
+    delta = '<span class="delta-new">neu</span>';
+  } else {
+    const diff = s.prev_position - s.position;
+    if (diff > 0) delta = `<span class="delta-up">▲ +${diff}</span>`;
+    else if (diff < 0) delta = `<span class="delta-down">▼ ${diff}</span>`;
+    else delta = '<span class="delta-same">–</span>';
+  }
+  row.innerHTML = `<td>${s.name}</td><td>${s.artists}</td><td class="pos">#${s.position}</td><td>${delta}</td><td>${s.first_seen}</td>`;
+  tbody.appendChild(row);
+
+  const chartRow = document.createElement('tr');
+  chartRow.className = 'chart-row';
+  chartRow.id = `chart-row-${idx}`;
+  chartRow.innerHTML = `<td colspan="5"><div class="chart-wrap"><canvas id="chart-${idx}"></canvas></div></td>`;
+  tbody.appendChild(chartRow);
+
+  row.addEventListener('click', () => {
+    const cr = document.getElementById(`chart-row-${idx}`);
+    const isOpen = cr.style.display === 'table-row';
+    cr.style.display = isOpen ? 'none' : 'table-row';
+    if (!isOpen && !cr.dataset.rendered) {
+      cr.dataset.rendered = '1';
+      new Chart(document.getElementById(`chart-${idx}`), {
+        type: 'line',
+        data: {
+          labels: s.history.map(h => h.date),
+          datasets: [{
+            label: s.name,
+            data: s.history.map(h => h.position),
+            borderColor: '#1db954',
+            backgroundColor: '#1db95433',
+            spanGaps: true,
+            fill: true,
+            tension: 0.2,
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { y: { reverse: true, title: { display: true, text: 'Position' } } }
+        }
+      });
+    }
+  });
+});
+</script>
+</body>
+</html>
