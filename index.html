@@ -70,6 +70,13 @@
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
   th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .overview-table thead th {
+    position: sticky;
+    top: 0;
+    background: var(--card);
+    z-index: 2;
+    box-shadow: 0 1px 0 var(--border);
+  }
   tr.song-row { cursor: pointer; }
   tr.song-row:hover { background: #1c2129; }
   .pos { font-weight: 700; }
@@ -131,7 +138,7 @@ overviewView.innerHTML = `
   <div class="grid">
     <div class="panel full-width">
       <h2>Präsenz je Playlist</h2>
-      <table>
+      <table class="overview-table">
         <thead><tr><th>Song</th><th>Interpret</th><th>In wie vielen Playlists</th>${playlistCols}</tr></thead>
         <tbody id="overviewTableBody"></tbody>
       </table>
