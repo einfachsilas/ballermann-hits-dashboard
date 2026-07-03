@@ -86,13 +86,14 @@
   .playlist-view.active { display: block; }
   .breadth-pill {
     display: inline-block;
-    background: #1db95422;
-    color: var(--accent);
     border-radius: 10px;
     padding: 1px 8px;
     font-size: 12px;
     font-weight: 600;
   }
+  .breadth-pill.full { background: #1db95422; color: var(--up); }
+  .breadth-pill.partial { background: #e3b34122; color: #e3b341; }
+  .breadth-pill.low { background: #f8514922; color: var(--down); }
   .not-present { color: var(--muted); }
 </style>
 </head>
@@ -140,13 +141,17 @@ overviewView.innerHTML = `
 viewsEl.appendChild(overviewView);
 
 const overviewBody = overviewView.querySelector('#overviewTableBody');
+const totalPlaylists = overview.playlists.length;
 overview.songs.forEach(s => {
   const row = document.createElement('tr');
   const posCells = overview.playlists.map(p => {
     const pos = s.positions[p.slug];
     return pos ? `<td class="pos">#${pos}</td>` : `<td class="not-present">–</td>`;
   }).join('');
-  row.innerHTML = `<td>${s.name}</td><td>${s.artists}</td><td><span class="breadth-pill">${s.breadth}/${overview.playlists.length}</span></td>${posCells}`;
+  let breadthClass = 'partial';
+  if (s.breadth >= totalPlaylists) breadthClass = 'full';
+  else if (s.breadth <= 1) breadthClass = 'low';
+  row.innerHTML = `<td>${s.name}</td><td>${s.artists}</td><td><span class="breadth-pill ${breadthClass}">${s.breadth}/${totalPlaylists}</span></td>${posCells}`;
   overviewBody.appendChild(row);
 });
 
