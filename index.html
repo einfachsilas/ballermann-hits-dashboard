@@ -67,6 +67,30 @@
     padding: 20px;
   }
   .panel h2 { font-size: 15px; margin: 0 0 14px; color: var(--text); }
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .panel-head h2 { margin: 0; }
+  .search-wrap { display: flex; align-items: center; gap: 8px; }
+  .search-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 7px 12px;
+    width: 240px;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+  .search-count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .search-empty { color: var(--muted); font-size: 13px; padding: 16px 4px; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
   th { color: var(--muted); font-weight: 500; font-size: 12px; }
@@ -148,11 +172,18 @@ overviewView.innerHTML = `
   <div class="subtitle">Summerfield-Songs über alle ${overview.playlists.length} getrackten Playlists hinweg</div>
   <div class="grid">
     <div class="panel full-width">
-      <h2>Präsenz je Playlist</h2>
+      <div class="panel-head">
+        <h2>Präsenz je Playlist</h2>
+        <div class="search-wrap">
+          <input type="text" id="songSearch" class="search-input" placeholder="Song oder Interpret suchen…" autocomplete="off">
+          <span class="search-count" id="songSearchCount"></span>
+        </div>
+      </div>
       <table class="overview-table">
         <thead><tr><th>Song</th><th>Interpret</th><th>In wie vielen Playlists</th>${playlistCols}</tr></thead>
         <tbody id="overviewTableBody"></tbody>
       </table>
+      <div id="songSearchEmpty" class="search-empty" style="display:none">Keine Songs gefunden.</div>
     </div>
   </div>
 `;
@@ -162,6 +193,7 @@ const overviewBody = overviewView.querySelector('#overviewTableBody');
 const totalPlaylists = overview.playlists.length;
 overview.songs.forEach(s => {
   const row = document.createElement('tr');
+  row.dataset.search = (s.name + ' ' + s.artists).toLowerCase();
   const posCells = overview.playlists.map(p => {
     const pos = s.positions[p.slug];
     return pos ? `<td class="pos">#${pos}</td>` : `<td class="not-present">–</td>`;
@@ -172,6 +204,24 @@ overview.songs.forEach(s => {
   row.innerHTML = `<td>${s.name}</td><td>${s.artists}</td><td><span class="breadth-pill ${breadthClass}">${s.breadth}/${totalPlaylists}</span></td>${posCells}`;
   overviewBody.appendChild(row);
 });
+
+const songSearchInput = overviewView.querySelector('#songSearch');
+const songSearchCount = overviewView.querySelector('#songSearchCount');
+const songSearchEmpty = overviewView.querySelector('#songSearchEmpty');
+const allRows = Array.from(overviewBody.querySelectorAll('tr'));
+function applySongSearch() {
+  const q = songSearchInput.value.trim().toLowerCase();
+  let visible = 0;
+  allRows.forEach(row => {
+    const match = !q || row.dataset.search.includes(q);
+    row.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  songSearchCount.textContent = q ? `${visible} / ${allRows.length}` : '';
+  songSearchEmpty.style.display = (q && visible === 0) ? '' : 'none';
+}
+songSearchInput.addEventListener('input', applySongSearch);
+overviewTab.addEventListener('click', () => setTimeout(() => songSearchInput.focus(), 0));
 
 overviewTab.addEventListener('click', () => {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
